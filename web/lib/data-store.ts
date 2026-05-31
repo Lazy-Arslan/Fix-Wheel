@@ -83,6 +83,16 @@ export async function saveCustomer(data: {
   });
 }
 
+export async function getCustomerProfile(name: string, cnic: string) {
+  const normalized = normalizeCnic(cnic);
+  return prisma.customer.findFirst({
+    where: {
+      cnic: normalized,
+      name: { equals: name.trim(), mode: "insensitive" },
+    },
+  });
+}
+
 export async function saveMechanic(data: {
   name: string;
   cnic: string;

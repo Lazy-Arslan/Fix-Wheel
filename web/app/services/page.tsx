@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MechanicCard } from "@/components/MechanicCard";
 import { LocalShopCard } from "@/components/LocalShopCard";
-import type { MechanicProfile } from "@/lib/types";
-import type { LocalShop } from "@/lib/types";
+import type { MechanicProfile, LocalShop } from "@/lib/types";
 import {
   CUSTOM_ISSUE,
   DELIVERY_PRICE,
@@ -14,15 +14,38 @@ import {
   OFFER_STEP,
   RADIUS_KM,
 } from "@/lib/constants";
-import { FixWheelLogo } from "@/components/FixWheelLogo";
+import { AppShell } from "@/components/layout/AppShell";
 import { getSession } from "@/lib/session";
+import { MARKETING, pub } from "@/lib/marketing-images";
 
 const VEHICLES = [
-  { id: "car", emoji: "🚗", label: "Car" },
-  { id: "bike", emoji: "🏍️", label: "Bike" },
-  { id: "ebike", emoji: "🛵", label: "E-Bike" },
-  { id: "truck", emoji: "🚛", label: "Truck" },
-  { id: "rickshaw", emoji: "🛺", label: "Rickshaw" },
+  { id: "car", label: "Car", image: MARKETING.vehicles.car },
+  { id: "bike", label: "Bike", image: MARKETING.vehicles.bike },
+  { id: "ebike", label: "E-Bike", image: pub("e bike.jfif") },
+  { id: "truck", label: "Truck", image: MARKETING.vehicles.truck },
+  {
+    id: "rickshaw",
+    label: "Rickshaw",
+    image: MARKETING.fallback("rickshaw", 400, 300),
+  },
+];
+
+const ISSUE_IMAGES: Record<string, string> = {
+  Puncture: MARKETING.services.tyres,
+  "Battery Issue": MARKETING.services.battery,
+  "Fuel Delivery": MARKETING.services.car,
+  "Oil Change": MARKETING.services.car,
+  "Engine Repair": MARKETING.services.inspect,
+  "Brake Service": MARKETING.services.dent,
+  Towing: MARKETING.vehicles.truck,
+  [CUSTOM_ISSUE]: MARKETING.services.inspect,
+};
+
+const STEPS = [
+  { n: 1, title: "Vehicle", hint: "Select your vehicle type" },
+  { n: 2, title: "Issue", hint: "What needs fixing?" },
+  { n: 3, title: "Offer", hint: "Set your price" },
+  { n: 4, title: "Mechanic", hint: "Find & book nearby" },
 ];
 
 function ServiceSelectionContent() {
@@ -31,6 +54,7 @@ function ServiceSelectionContent() {
   const userLat = parseFloat(searchParams.get("lat") ?? "0");
   const userLng = parseFloat(searchParams.get("lng") ?? "0");
 
+  const [step, setStep] = useState(1);
   const [selectedVehicle, setSelectedVehicle] = useState("car");
   const [issue, setIssue] = useState(ISSUES_WITH_CUSTOM[0]);
   const [customIssueText, setCustomIssueText] = useState("");
@@ -44,9 +68,7 @@ function ServiceSelectionContent() {
 
   useEffect(() => {
     const session = getSession();
-    if (!session?.isLoggedIn) {
-      router.replace("/login");
-    }
+    if (!session?.isLoggedIn) router.replace("/login");
   }, [router]);
 
   const updateCharges = (nextIssue: string) => {
@@ -62,9 +84,7 @@ function ServiceSelectionContent() {
   };
 
   const loadLocalShops = async () => {
-    const res = await fetch(
-      `/api/osm/nearby-shops?lat=${userLat}&lng=${userLng}`
-    );
+    const res = await fetch(`/api/osm/nearby-shops?lat=${userLat}&lng=${userLng}`);
     const data = await res.json();
     setLocalShops(data.shops ?? []);
   };
@@ -107,13 +127,13 @@ function ServiceSelectionContent() {
       alert("Location not available. Go back and confirm location.");
       return;
     }
-
     if (issue === CUSTOM_ISSUE && !customIssueText.trim()) {
       alert("Please describe your custom issue.");
       return;
     }
 
     setSearched(true);
+    setStep(4);
 
     const res = await fetch(
       `/api/mechanics/nearby?lat=${userLat}&lng=${userLng}&radius=${RADIUS_KM}`
@@ -124,164 +144,226 @@ function ServiceSelectionContent() {
 
     if (list.length === 0) {
       await loadLocalShops();
-      alert(
-        "No registered FixWheel mechanics within 20 km. See suggested local shops below."
-      );
+      alert("No registered FixWheel mechanics within 20 km. See suggested local shops below.");
     } else {
       setLocalShops([]);
       alert(`${list.length} mechanic(s) found near you!`);
     }
   };
 
-  return (
-    <div className="min-h-screen overflow-y-auto bg-[#F5F7FB]">
-      <header className="bg-[#0D47A1] px-4 py-3 text-white">
-        <div className="flex items-center gap-2.5">
-          <FixWheelLogo size={32} />
-          <h1 className="text-lg font-bold">FixWheel Services</h1>
-        </div>
-      </header>
+  const goNext = () => {
+    if (step === 2 && issue === CUSTOM_ISSUE && !customIssueText.trim()) {
+      alert("Please describe your custom issue.");
+      return;
+    }
+    if (step < 3) setStep(step + 1);
+    else findNearbyMechanics();
+  };
 
-      <div className="p-4">
-        <h2 className="mb-3 text-base font-bold text-[#003366]">Select Vehicle</h2>
-        <div className="mb-5 flex gap-2.5 overflow-x-auto pb-1">
-          {VEHICLES.map((v) => (
+  return (
+    <AppShell
+      role="customer"
+      activeNav="services"
+      title="Book a service"
+      subtitle="Step-by-step booking"
+    >
+      <div className="app-page service-flow">
+        <div className="service-steps-bar app-fade-in">
+          {STEPS.map((s) => (
             <button
-              key={v.id}
+              key={s.n}
               type="button"
-              onClick={() => setSelectedVehicle(v.id)}
-              className={`flex h-[90px] w-[90px] shrink-0 cursor-pointer flex-col items-center justify-center rounded-xl p-2 transition-transform hover:scale-[1.02] ${
-                selectedVehicle === v.id
-                  ? "border-2 border-[#003D82] bg-[#D6E4FF]"
-                  : "border border-[#DDDDDD] bg-white"
-              }`}
+              onClick={() => s.n <= step && setStep(s.n)}
+              className={`service-step-dot ${step >= s.n ? "done" : ""} ${step === s.n ? "active" : ""}`}
             >
-              <span className="text-3xl">{v.emoji}</span>
-              <span className="mt-1.5 text-xs font-bold text-[#003366]">
-                {v.label}
-              </span>
+              <span className="service-step-num">{s.n}</span>
+              <span className="service-step-label">{s.title}</span>
             </button>
           ))}
         </div>
 
-        <h2 className="mb-2 text-base font-bold text-[#003366]">Select Issue</h2>
-        <div className="mb-3 flex min-h-[52px] items-center rounded-xl bg-white px-3.5 shadow-sm">
-          <span className="mr-2.5 text-lg">🔧</span>
-          <select
-            value={issue}
-            onChange={(e) => updateCharges(e.target.value)}
-            className="flex-1 cursor-pointer bg-transparent text-sm outline-none"
-          >
-            {ISSUES_WITH_CUSTOM.map((i) => (
-              <option key={i} value={i}>
-                {i}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {issue === CUSTOM_ISSUE && (
-          <div className="mb-5">
-            <label className="mb-1 block text-sm font-bold text-[#333]">
-              Describe your issue *
-            </label>
-            <textarea
-              value={customIssueText}
-              onChange={(e) => setCustomIssueText(e.target.value)}
-              placeholder="e.g. AC not cooling, strange noise from engine..."
-              className="h-20 w-full rounded-lg border-2 border-[#CCC] px-3 py-2 text-sm outline-none focus:border-[#003D82]"
-            />
-          </div>
+        {step === 1 && (
+          <section className="service-step-card app-fade-in">
+            <div className="service-step-header">
+              <span className="service-step-badge">Step 1</span>
+              <h2 className="service-step-title">Select vehicle type</h2>
+              <p className="service-step-desc">Choose the vehicle that needs service today.</p>
+            </div>
+            <div className="service-vehicle-grid">
+              {VEHICLES.map((v, i) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setSelectedVehicle(v.id)}
+                  className={`service-vehicle-card ${selectedVehicle === v.id ? "selected" : ""}`}
+                  style={{ animationDelay: `${i * 0.05}s` }}
+                >
+                  <div className="service-vehicle-img-wrap">
+                    <Image
+                      src={v.image}
+                      alt={v.label}
+                      fill
+                      className="object-cover"
+                      sizes="160px"
+                      unoptimized={!v.image.startsWith("/")}
+                    />
+                  </div>
+                  <span className="service-vehicle-label">{v.label}</span>
+                </button>
+              ))}
+            </div>
+            <button type="button" onClick={goNext} className="app-btn app-btn-primary service-next-btn">
+              Continue to issue →
+            </button>
+          </section>
         )}
 
-        <div className="mb-5 rounded-xl bg-white p-[18px] shadow-md">
-          <h3 className="mb-3 text-base font-bold text-[#003366]">
-            Estimated Charges
-          </h3>
-          <div className="mb-1.5 flex justify-between text-[13px]">
-            <span className="text-[#777777]">Service Charges</span>
-            <span className="text-[#333333]">Rs. {servicePrice}</span>
-          </div>
-          <div className="mb-3.5 flex justify-between text-[13px]">
-            <span className="text-[#777777]">Delivery Charges</span>
-            <span className="text-[#333333]">Rs. {DELIVERY_PRICE}</span>
-          </div>
-          <div className="mb-3.5 h-px bg-[#EEEEEE]" />
-          <p className="mb-2.5 text-[13px] text-[#777777]">Your Offer</p>
-          <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => {
-                if (offerAmount - OFFER_STEP >= OFFER_STEP) {
-                  setOfferAmount(offerAmount - OFFER_STEP);
-                } else {
-                  alert("Minimum offer is Rs. 50");
-                }
-              }}
-              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-lg bg-[#003D82] text-2xl text-white"
-            >
-              −
-            </button>
-            <span className="text-2xl font-bold text-[#003D82]">
-              Rs. {offerAmount}
-            </span>
-            <button
-              type="button"
-              onClick={() => setOfferAmount(offerAmount + OFFER_STEP)}
-              className="flex h-12 w-12 cursor-pointer items-center justify-center rounded-lg bg-[#003D82] text-2xl text-white"
-            >
-              +
-            </button>
-          </div>
-          <p className="mt-2 text-center text-[11px] text-[#AAAAAA]">
-            Adjust your offer. Mechanics will respond to your price.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={findNearbyMechanics}
-          className="mb-5 h-[55px] w-full cursor-pointer rounded-lg bg-[#003D82] text-base font-bold text-white hover:bg-[#004a99]"
-        >
-          FIND NEAREST MECHANICS
-        </button>
-
-        {mechanics.length > 0 && (
-          <>
-            <h2 className="mb-2.5 text-lg font-bold text-[#003366]">
-              Nearby Mechanics
-            </h2>
-            {mechanics.map((m, i) => (
-              <MechanicCard
-                key={`${m.shopName}-${m.phone}-${i}`}
-                mechanic={m}
-                onBook={handleBook}
+        {step === 2 && (
+          <section className="service-step-card app-fade-in">
+            <div className="service-step-header">
+              <span className="service-step-badge">Step 2</span>
+              <h2 className="service-step-title">What is the issue?</h2>
+              <p className="service-step-desc">Pick the closest match — you can describe details below.</p>
+            </div>
+            <div className="service-issue-grid">
+              {ISSUES_WITH_CUSTOM.map((item, i) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => updateCharges(item)}
+                  className={`service-issue-card ${issue === item ? "selected" : ""}`}
+                  style={{ animationDelay: `${i * 0.04}s` }}
+                >
+                  <div className="service-issue-img-wrap">
+                    <Image
+                      src={ISSUE_IMAGES[item] ?? MARKETING.services.car}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      sizes="120px"
+                      unoptimized={!(ISSUE_IMAGES[item] ?? "").startsWith("/")}
+                    />
+                  </div>
+                  <span className="service-issue-label">{item}</span>
+                  {item !== CUSTOM_ISSUE && (
+                    <span className="service-issue-price">from Rs. {ISSUE_CHARGES[item]}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+            {issue === CUSTOM_ISSUE && (
+              <textarea
+                value={customIssueText}
+                onChange={(e) => setCustomIssueText(e.target.value)}
+                placeholder="Describe your issue in detail…"
+                className="service-custom-issue"
               />
-            ))}
-          </>
+            )}
+            <div className="service-step-actions">
+              <button type="button" onClick={() => setStep(1)} className="app-btn app-btn-outline">
+                Back
+              </button>
+              <button type="button" onClick={goNext} className="app-btn app-btn-primary flex-1">
+                Continue to offer →
+              </button>
+            </div>
+          </section>
         )}
 
-        {searched && mechanics.length === 0 && (
-          <>
-            <h2 className="mb-1 text-lg font-bold text-[#003366]">
-              Suggested local shops nearby
-            </h2>
-            <p className="mb-3 text-xs text-[#888]">
-              Not on FixWheel yet — local car repair shops from OpenStreetMap (~8 km)
-            </p>
-            {localShops.length === 0 ? (
-              <p className="rounded-lg bg-white p-4 text-sm text-[#666] shadow-sm">
-                No shops found in OpenStreetMap for this area. Try a different service location.
+        {step === 3 && (
+          <section className="service-step-card app-fade-in">
+            <div className="service-step-header">
+              <span className="service-step-badge">Step 3</span>
+              <h2 className="service-step-title">Set your offer</h2>
+              <p className="service-step-desc">Mechanics can accept or counter your price.</p>
+            </div>
+            <div className="service-offer-card">
+              <div className="service-offer-row">
+                <span>Service charges</span>
+                <strong>Rs. {servicePrice}</strong>
+              </div>
+              <div className="service-offer-row">
+                <span>Delivery</span>
+                <strong>Rs. {DELIVERY_PRICE}</strong>
+              </div>
+              <div className="service-offer-divider" />
+              <p className="service-offer-label">Your total offer</p>
+              <div className="service-offer-controls">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (offerAmount - OFFER_STEP >= OFFER_STEP) setOfferAmount(offerAmount - OFFER_STEP);
+                    else alert("Minimum offer is Rs. 50");
+                  }}
+                  className="service-offer-btn"
+                  aria-label="Decrease offer"
+                >
+                  −
+                </button>
+                <span className="service-offer-amount">Rs. {offerAmount}</span>
+                <button
+                  type="button"
+                  onClick={() => setOfferAmount(offerAmount + OFFER_STEP)}
+                  className="service-offer-btn"
+                  aria-label="Increase offer"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="service-step-actions">
+              <button type="button" onClick={() => setStep(2)} className="app-btn app-btn-outline">
+                Back
+              </button>
+              <button type="button" onClick={goNext} className="app-btn app-btn-primary flex-1">
+                Find nearest mechanics
+              </button>
+            </div>
+          </section>
+        )}
+
+        {step === 4 && (
+          <section className="service-step-card app-fade-in">
+            <div className="service-step-header">
+              <span className="service-step-badge">Step 4</span>
+              <h2 className="service-step-title">Nearby mechanics</h2>
+              <p className="service-step-desc">
+                {VEHICLES.find((v) => v.id === selectedVehicle)?.label} · {issue === CUSTOM_ISSUE ? customIssueText : issue} · Rs. {offerAmount}
               </p>
+            </div>
+
+            {mechanics.length > 0 ? (
+              <div className="space-y-3">
+                {mechanics.map((m, i) => (
+                  <div key={`${m.shopName}-${m.phone}-${i}`} className="app-fade-in" style={{ animationDelay: `${i * 0.05}s` }}>
+                    <MechanicCard mechanic={m} onBook={handleBook} />
+                  </div>
+                ))}
+              </div>
+            ) : searched ? (
+              <div>
+                <p className="mb-3 text-sm text-[var(--gm-text-muted)]">
+                  No FixWheel mechanics in range — suggested local shops from OpenStreetMap (~8 km)
+                </p>
+                {localShops.length === 0 ? (
+                  <p className="app-card app-card-pad text-sm text-[var(--gm-text-muted)]">
+                    No shops found. Try a different service location on the map.
+                  </p>
+                ) : (
+                  localShops.map((shop) => <LocalShopCard key={shop.placeId} shop={shop} />)
+                )}
+              </div>
             ) : (
-              localShops.map((shop) => (
-                <LocalShopCard key={shop.placeId} shop={shop} />
-              ))
+              <p className="text-sm text-[var(--gm-text-muted)]">Searching…</p>
             )}
-          </>
+
+            <button type="button" onClick={() => setStep(3)} className="app-btn app-btn-outline mt-4 w-full">
+              ← Adjust offer
+            </button>
+          </section>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }
 
@@ -289,7 +371,9 @@ export default function ServicesPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#F5F7FB] p-4">Loading...</div>
+        <div className="app-loading">
+          <p className="app-loading-pulse">Loading services…</p>
+        </div>
       }
     >
       <ServiceSelectionContent />

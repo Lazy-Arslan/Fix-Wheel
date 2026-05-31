@@ -128,7 +128,22 @@ export function OsmMapView({
 
     mapRef.current = map;
 
+    const fixSize = () => {
+      map.invalidateSize({ animate: false });
+    };
+    const t1 = window.setTimeout(fixSize, 0);
+    const t2 = window.setTimeout(fixSize, 300);
+
+    let ro: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== "undefined" && containerRef.current) {
+      ro = new ResizeObserver(fixSize);
+      ro.observe(containerRef.current);
+    }
+
     return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      ro?.disconnect();
       map.remove();
       mapRef.current = null;
       circleRef.current = null;
@@ -309,5 +324,5 @@ export function OsmMapView({
     }
   }, [focusMode, serviceLocation, mechanics, bookedMechanic]);
 
-  return <div ref={containerRef} className="h-full w-full z-0" />;
+  return <div ref={containerRef} className="app-map-canvas" />;
 }

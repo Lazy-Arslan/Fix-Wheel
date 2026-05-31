@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import {
   createBooking,
   getActiveCustomerBooking,
+  getBookingHistoryForCustomer,
+  getBookingHistoryForMechanic,
   getBookingsForMechanic,
 } from "@/lib/booking-store";
 import { normalizeCnic, validateCnic, validateName } from "@/lib/validation";
@@ -79,6 +81,7 @@ export async function GET(request: Request) {
     const name = searchParams.get("name") ?? "";
     const cnic = searchParams.get("cnic") ?? "";
     const activeOnly = searchParams.get("active") === "true";
+    const history = searchParams.get("history") === "true";
 
     const nameErr = validateName(name);
     const cnicErr = validateCnic(cnic);
@@ -87,6 +90,10 @@ export async function GET(request: Request) {
     }
 
     if (role === "customer") {
+      if (history) {
+        const bookings = await getBookingHistoryForCustomer(name, cnic);
+        return NextResponse.json({ bookings });
+      }
       if (activeOnly) {
         const booking = await getActiveCustomerBooking(name, cnic);
         return NextResponse.json({ booking });
@@ -94,6 +101,10 @@ export async function GET(request: Request) {
     }
 
     if (role === "mechanic") {
+      if (history) {
+        const bookings = await getBookingHistoryForMechanic(name, cnic);
+        return NextResponse.json({ bookings });
+      }
       const bookings = await getBookingsForMechanic(name, cnic);
       return NextResponse.json({ bookings });
     }

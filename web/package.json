@@ -9,7 +9,8 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:push": "dotenv -e .env.local -- prisma db push",
-    "db:import": "dotenv -e .env.local -- tsx scripts/import-csv.ts"
+    "db:import": "dotenv -e .env.local -- tsx scripts/import-csv.ts",
+    "db:wipe": "dotenv -e .env.local -- tsx scripts/wipe-db.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

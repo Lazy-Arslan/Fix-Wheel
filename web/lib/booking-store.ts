@@ -190,6 +190,56 @@ export async function getBookingsForMechanic(
   return bookings.map(toBookingRecord);
 }
 
+const HISTORY_STATUSES = ["completed", "cancelled"];
+
+export async function getBookingHistoryForCustomer(
+  name: string,
+  cnic: string
+): Promise<BookingRecord[]> {
+  const normalizedCnic = normalizeCnic(cnic);
+  const bookings = await prisma.booking.findMany({
+    where: {
+      customerCnic: normalizedCnic,
+      status: { in: HISTORY_STATUSES },
+    },
+    include: bookingInclude,
+    orderBy: { updatedAt: "desc" },
+    take: 50,
+  });
+
+  return bookings
+    .filter(
+      (b) => b.customerName.trim().toLowerCase() === name.trim().toLowerCase()
+    )
+    .map(toBookingRecord);
+}
+
+export async function getBookingHistoryForMechanic(
+  name: string,
+  cnic: string
+): Promise<BookingRecord[]> {
+  const normalizedCnic = normalizeCnic(cnic);
+  const mechanic = await prisma.mechanic.findFirst({
+    where: {
+      cnic: normalizedCnic,
+      name: { equals: name.trim(), mode: "insensitive" },
+    },
+  });
+  if (!mechanic) return [];
+
+  const bookings = await prisma.booking.findMany({
+    where: {
+      mechanicId: mechanic.id,
+      status: { in: HISTORY_STATUSES },
+    },
+    include: bookingInclude,
+    orderBy: { updatedAt: "desc" },
+    take: 50,
+  });
+
+  return bookings.map(toBookingRecord);
+}
+
 export async function getActiveCustomerBooking(
   name: string,
   cnic: string

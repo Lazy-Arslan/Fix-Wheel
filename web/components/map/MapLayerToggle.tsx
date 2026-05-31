@@ -49,7 +49,7 @@ export function MapLayerToggle({
   onBookedUnavailable,
 }: MapLayerToggleProps) {
   return (
-    <div className="flex justify-center gap-2 px-4 py-2.5">
+    <div className="map-layer-toggle-inline">
       {MODES.map((mode) => {
         const isActive = value === mode.id;
         const isBooked = mode.id === "booked";

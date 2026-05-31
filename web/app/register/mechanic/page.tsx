@@ -5,6 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { CnicInput } from "@/components/CnicInput";
+import { BackButton } from "@/components/layout/BackButton";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ShopLocationPicker } from "@/components/map/ShopLocationPicker";
 import type { ShopLocationValue } from "@/components/map/ShopLocationPicker";
 import { SPECIALIZATIONS } from "@/lib/constants";
@@ -26,7 +29,7 @@ function Field({
 }) {
   return (
     <div className="mb-4">
-      <label className="block text-sm font-bold text-[#333333]">
+      <label className="mb-1.5 block text-sm font-bold text-[var(--fw-navy)]">
         {label}
         {required ? " *" : ""}
       </label>
@@ -36,7 +39,7 @@ function Field({
 }
 
 const inputClass =
-  "mt-1 h-[50px] w-full rounded-lg border-2 border-[#CCCCCC] bg-white px-3 text-[15px] outline-none focus:border-[#003D82]";
+  "mt-1 h-[50px] w-full rounded-lg border border-[var(--fw-border)] bg-[#f8fafc] px-3 text-[15px] outline-none transition focus:border-[var(--fw-blue)] focus:bg-white focus:ring-2 focus:ring-[var(--fw-blue)]/10";
 
 const selectClass = inputClass + " cursor-pointer";
 
@@ -137,16 +140,24 @@ export default function MechanicRegisterPage() {
   };
 
   return (
-    <div className="min-h-screen overflow-y-auto bg-[#f5f5f5]">
-      <div className="mx-auto max-w-lg p-5">
-        <div className="mb-8 flex flex-col items-center">
-          <span className="text-6xl" role="img" aria-label="Mechanic">
+    <div className="flex min-h-screen flex-col bg-[var(--fw-bg)]">
+      <SiteHeader />
+      <main className="flex-1 py-8">
+      <div className="fw-container mx-auto max-w-lg">
+        <div className="mb-4">
+          <BackButton label="Back" fallbackHref="/register" />
+        </div>
+        <div className="mb-8 flex flex-col items-center animate-fade-up">
+          <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--fw-orange)] to-[#ff8533] text-3xl">
             🔧
           </span>
-          <h1 className="mt-2.5 text-2xl font-bold text-[#003366]">
+          <h1 className="mt-4 text-2xl font-extrabold text-[var(--fw-navy)]">
             Mechanic Registration
           </h1>
+          <p className="mt-1 text-sm text-slate-500">List your shop and receive bookings</p>
         </div>
+
+        <div className="fw-card p-6 md:p-8">
 
         <Field label="Full Name" required>
           <input
@@ -281,17 +292,20 @@ export default function MechanicRegisterPage() {
           type="button"
           onClick={submit}
           disabled={loading}
-          className="mb-5 h-[50px] w-full cursor-pointer rounded-[10px] bg-[#003366] text-base font-bold text-white transition-all hover:bg-[#004080] hover:shadow-md active:scale-[0.99] disabled:opacity-70"
+          className="fw-btn fw-btn-primary mb-5 h-12 w-full text-sm"
         >
-          REGISTER
+          {loading ? "Registering…" : "REGISTER"}
         </button>
 
-        <p className="text-center text-sm">
-          <Link href="/login" className="cursor-pointer text-[#003D82] hover:underline">
+        <p className="text-center text-sm text-slate-600">
+          <Link href="/login" className="font-bold text-[var(--fw-blue)] hover:underline">
             Back to Login
           </Link>
         </p>
+        </div>
       </div>
+      </main>
+      <SiteFooter />
     </div>
   );
 }

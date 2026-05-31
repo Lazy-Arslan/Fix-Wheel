@@ -3,8 +3,8 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FixWheelLogo } from "@/components/FixWheelLogo";
-import { clearSession, getSession } from "@/lib/session";
+import { AppShell } from "@/components/layout/AppShell";
+import { getSession } from "@/lib/session";
 import type { BookingRecord } from "@/lib/types";
 
 const CustomerLocationMap = dynamic(
@@ -12,7 +12,7 @@ const CustomerLocationMap = dynamic(
     import("@/components/map/CustomerLocationMap").then(
       (m) => m.CustomerLocationMap
     ),
-  { ssr: false, loading: () => <div className="h-[220px] bg-[#E8EEF5]" /> }
+  { ssr: false, loading: () => <div className="h-[220px] rounded-xl bg-[#E8EEF5]" /> }
 );
 
 interface MechanicProfileData {
@@ -42,6 +42,13 @@ const STATUS_LABELS: Record<string, string> = {
   countered: "Waiting for customer",
   confirmed: "In progress",
   completion_pending: "Awaiting confirmation",
+};
+
+const STATUS_CHIP: Record<string, string> = {
+  pending: "app-chip-orange",
+  countered: "app-chip-blue",
+  confirmed: "app-chip-green",
+  completion_pending: "app-chip-amber",
 };
 
 export default function MechanicHomePage() {
@@ -191,97 +198,65 @@ export default function MechanicHomePage() {
     }
   };
 
-  const logout = () => {
-    clearSession();
-    router.replace("/login");
-  };
-
   const pendingCount = bookings.filter((b) => b.status === "pending").length;
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f5f5f5]">
-        <p className="text-[#666]">Loading...</p>
+      <div className="app-loading">
+        <p className="app-loading-pulse">Loading dashboard…</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
-      <header className="bg-[#0D47A1] px-4 py-4 text-white">
-        <div className="mx-auto flex max-w-lg items-center justify-between">
-          <div className="flex items-center gap-3">
-            <FixWheelLogo size={36} />
-            <div>
-              <h1 className="text-lg font-bold">Mechanic Dashboard</h1>
-              <p className="text-xs text-blue-100">
-                {profile?.shopName ?? "FixWheel Partner"}
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={logout}
-            className="cursor-pointer rounded-lg border border-white/40 px-3 py-1.5 text-xs font-bold hover:bg-white/10"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-lg p-4">
+    <AppShell
+      role="mechanic"
+      activeNav="mechanic"
+      title="Mechanic Dashboard"
+      subtitle={profile?.shopName ?? "FixWheel Partner"}
+    >
+      <div className="app-page">
         {pendingCount > 0 && (
-          <div className="mb-4 rounded-xl bg-gradient-to-r from-[#FFF3E0] to-[#FFE0B2] p-3 text-sm font-bold text-[#E65100] shadow-sm">
+          <div className="app-alert app-alert-warn mb-4">
             🔔 {pendingCount} new booking{pendingCount > 1 ? "s" : ""} — respond
             below
           </div>
         )}
 
-        <div className="mb-4 rounded-xl bg-white p-4 shadow-md">
-          <h2 className="mb-3 text-base font-bold text-[#003366]">
-            Customer Bookings
-          </h2>
+        <div className="app-card app-card-pad mb-4 app-fade-in">
+          <h2 className="app-section-title">Customer Bookings</h2>
 
           {bookings.length === 0 ? (
-            <p className="text-sm text-[#888]">
+            <p className="text-sm text-[var(--gm-text-muted)]">
               No bookings yet. When a customer books you, details appear here.
             </p>
           ) : (
             <div className="space-y-2">
-              {bookings.map((b) => (
+              {bookings.map((b, i) => (
                 <button
                   key={b.id}
                   type="button"
                   onClick={() => setSelectedBooking(b)}
-                  className={`w-full cursor-pointer rounded-lg border p-3 text-left transition-colors ${
-                    selectedBooking?.id === b.id
-                      ? "border-[#003D82] bg-[#E3F2FD]"
-                      : "border-[#EEE] bg-[#FAFAFA] hover:bg-[#F0F4FF]"
+                  className={`app-list-item app-fade-in ${
+                    selectedBooking?.id === b.id ? "selected" : ""
                   }`}
+                  style={{ animationDelay: `${i * 0.04}s` }}
                 >
-                  <div className="flex items-center justify-between">
-                    <p className="font-bold text-[#003366]">{b.customerName}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-bold text-[var(--gm-text)]">{b.customerName}</p>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                        b.status === "pending"
-                          ? "bg-orange-100 text-orange-700"
-                          : b.status === "countered"
-                            ? "bg-blue-100 text-blue-700"
-                            : b.status === "completion_pending"
-                              ? "bg-amber-100 text-amber-800"
-                              : "bg-green-100 text-green-700"
-                      }`}
+                      className={`app-chip ${STATUS_CHIP[b.status] ?? "app-chip-blue"}`}
                     >
                       {STATUS_LABELS[b.status] ?? b.status}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-[#666]">
+                  <p className="mt-1.5 text-xs text-[var(--gm-text-muted)]">
                     {VEHICLE_LABELS[b.vehicle] ?? b.vehicle} · {b.issueDisplay}
                   </p>
-                  <p className="mt-1 text-sm font-bold text-[#003D82]">
+                  <p className="mt-1.5 text-sm font-bold text-[var(--gm-orange)]">
                     Rs. {b.currentPrice}
                     {b.etaDisplay && (
-                      <span className="ml-2 text-xs font-normal text-[#2E7D32]">
+                      <span className="ml-2 text-xs font-semibold text-[var(--gm-green)]">
                         · ETA {b.etaDisplay}
                       </span>
                     )}
@@ -293,43 +268,38 @@ export default function MechanicHomePage() {
         </div>
 
         {selectedBooking && (
-          <div className="mb-4 space-y-3 rounded-xl bg-white p-4 shadow-md">
-            <h3 className="text-base font-bold text-[#003366]">
-              Booking Details
-            </h3>
-            <Row label="Customer" value={selectedBooking.customerName} />
-            <Row
+          <div className="app-card app-card-pad mb-4 app-fade-in">
+            <h3 className="app-section-title">Booking Details</h3>
+            <DetailRow label="Customer" value={selectedBooking.customerName} />
+            <DetailRow
               label="Vehicle"
               value={
-                VEHICLE_LABELS[selectedBooking.vehicle] ??
-                selectedBooking.vehicle
+                VEHICLE_LABELS[selectedBooking.vehicle] ?? selectedBooking.vehicle
               }
             />
-            <Row label="Issue" value={selectedBooking.issueDisplay} />
-            <Row
+            <DetailRow label="Issue" value={selectedBooking.issueDisplay} />
+            <DetailRow
               label="Customer offer"
               value={`Rs. ${selectedBooking.offerAmount}`}
             />
             {selectedBooking.mechanicCounter != null && (
-              <Row
+              <DetailRow
                 label="Your counter"
                 value={`Rs. ${selectedBooking.mechanicCounter}`}
               />
             )}
             {selectedBooking.agreedPrice != null && (
-              <Row
+              <DetailRow
                 label="Agreed price"
                 value={`Rs. ${selectedBooking.agreedPrice}`}
               />
             )}
             {selectedBooking.etaDisplay && (
-              <Row label="Est. arrival" value={selectedBooking.etaDisplay} />
+              <DetailRow label="Est. arrival" value={selectedBooking.etaDisplay} />
             )}
 
-            <div>
-              <p className="mb-2 text-xs font-bold text-[#999]">
-                Customer location
-              </p>
+            <div className="mt-4">
+              <p className="app-detail-label mb-2">Customer location</p>
               <CustomerLocationMap
                 customerLat={selectedBooking.customerLat}
                 customerLng={selectedBooking.customerLng}
@@ -340,8 +310,8 @@ export default function MechanicHomePage() {
             </div>
 
             {selectedBooking.status === "pending" && (
-              <div className="space-y-3 border-t border-[#EEE] pt-3">
-                <p className="text-xs text-[#666]">
+              <div className="mt-4 space-y-3 border-t border-[var(--gm-border)] pt-4">
+                <p className="text-xs text-[var(--gm-text-muted)]">
                   Accept the customer&apos;s offer or propose a different price.
                 </p>
                 <div className="flex gap-2">
@@ -349,7 +319,7 @@ export default function MechanicHomePage() {
                     type="button"
                     disabled={actionLoading}
                     onClick={() => bookingAction("accept")}
-                    className="flex-1 rounded-lg bg-[#2E7D32] py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1B5E20] disabled:opacity-70"
+                    className="app-btn app-btn-success flex-1 text-sm"
                   >
                     Accept Rs. {selectedBooking.offerAmount}
                   </button>
@@ -357,29 +327,29 @@ export default function MechanicHomePage() {
                     type="button"
                     disabled={actionLoading}
                     onClick={() => setShowPriceInput(true)}
-                    className="flex-1 rounded-lg bg-[#0D47A1] py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1565C0] disabled:opacity-70"
+                    className="app-btn app-btn-blue flex-1 text-sm"
                   >
                     Change price
                   </button>
                 </div>
 
                 {showPriceInput && (
-                  <div className="rounded-xl border-2 border-[#0D47A1] bg-[#F5F9FF] p-4">
-                    <label className="mb-2 block text-sm font-bold text-[#003366]">
+                  <div className="app-card app-card-pad border-blue-200 bg-[#F5F9FF]">
+                    <label className="mb-2 block text-sm font-bold text-[var(--gm-text)]">
                       Enter your price (Rs.)
                     </label>
                     <input
                       type="number"
                       value={newPrice}
                       onChange={(e) => setNewPrice(e.target.value)}
-                      className="mb-3 w-full rounded-lg border-2 border-[#CCC] px-3 py-2.5 text-base outline-none focus:border-[#0D47A1]"
+                      className="mb-3 w-full rounded-xl border border-[var(--gm-border)] px-3 py-2.5 text-base outline-none focus:border-[#1565c0] focus:ring-2 focus:ring-blue-100"
                       placeholder="e.g. 600"
                     />
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={() => setShowPriceInput(false)}
-                        className="flex-1 rounded-lg border border-[#CCC] py-2.5 text-sm font-bold text-[#666]"
+                        className="app-btn app-btn-outline flex-1 text-sm"
                       >
                         Cancel
                       </button>
@@ -394,9 +364,9 @@ export default function MechanicHomePage() {
                           }
                           bookingAction("counter", p);
                         }}
-                        className="flex-1 rounded-lg bg-[#0D47A1] py-2.5 text-sm font-bold text-white disabled:opacity-70"
+                        className="app-btn app-btn-blue flex-1 text-sm"
                       >
-                        OK — Send to customer
+                        Send to customer
                       </button>
                     </div>
                   </div>
@@ -405,7 +375,7 @@ export default function MechanicHomePage() {
             )}
 
             {selectedBooking.status === "countered" && (
-              <div className="rounded-lg bg-[#E3F2FD] p-3 text-sm text-[#1565C0]">
+              <div className="app-alert app-alert-info mt-4">
                 Your price Rs. {selectedBooking.mechanicCounter} sent. Waiting
                 for customer to accept or counter.
               </div>
@@ -414,15 +384,15 @@ export default function MechanicHomePage() {
             {(selectedBooking.status === "confirmed" ||
               selectedBooking.status === "completion_pending") &&
               !selectedBooking.mechanicCompleted && (
-                <div className="space-y-3 border-t border-[#EEE] pt-3">
+                <div className="mt-4 space-y-3 border-t border-[var(--gm-border)] pt-4">
                   {selectedBooking.status === "confirmed" && (
-                    <div className="rounded-lg bg-[#E8F5E9] p-3 text-sm text-[#2E7D32]">
+                    <div className="app-alert app-alert-success">
                       ✓ Confirmed at Rs. {selectedBooking.agreedPrice}. Head to
                       customer — ETA {selectedBooking.etaDisplay}.
                     </div>
                   )}
                   {selectedBooking.customerCompleted && (
-                    <p className="text-xs text-[#666]">
+                    <p className="text-xs text-[var(--gm-text-muted)]">
                       Customer confirmed issue resolved — mark service complete
                       to close.
                     </p>
@@ -431,7 +401,7 @@ export default function MechanicHomePage() {
                     type="button"
                     disabled={actionLoading}
                     onClick={completeService}
-                    className="w-full rounded-lg bg-[#2E7D32] py-3 text-sm font-bold text-white shadow-sm hover:bg-[#1B5E20] disabled:opacity-70"
+                    className="app-btn app-btn-success w-full text-sm"
                   >
                     ✓ Service completed — notify customer
                   </button>
@@ -442,7 +412,7 @@ export default function MechanicHomePage() {
               selectedBooking.status === "completion_pending") &&
               selectedBooking.mechanicCompleted &&
               !selectedBooking.customerCompleted && (
-                <div className="rounded-lg border border-[#A5D6A7] bg-[#F1F8E9] p-3 text-sm text-[#33691E]">
+                <div className="app-alert app-alert-success mt-4">
                   Service marked complete. Waiting for customer to confirm the
                   issue is resolved.
                 </div>
@@ -451,7 +421,7 @@ export default function MechanicHomePage() {
             {selectedBooking.status === "completion_pending" &&
               selectedBooking.mechanicCompleted &&
               selectedBooking.customerCompleted && (
-                <div className="rounded-lg bg-[#E8F5E9] p-3 text-center text-sm font-bold text-[#2E7D32]">
+                <div className="app-alert app-alert-success mt-4 text-center font-bold">
                   Both confirmed — closing booking…
                 </div>
               )}
@@ -459,23 +429,26 @@ export default function MechanicHomePage() {
         )}
 
         {profile && (
-          <div className="rounded-xl bg-white p-4 shadow-md">
-            <h3 className="text-sm font-bold text-[#003366]">Your shop</h3>
-            <p className="mt-1 text-xs text-[#666]">
+          <div className="app-card app-card-pad app-fade-in">
+            <h3 className="text-sm font-bold text-[var(--gm-text)]">Your shop</h3>
+            <p className="mt-1 text-sm text-[var(--gm-text-muted)]">
               {profile.shopName} · {profile.specialization}
+            </p>
+            <p className="mt-1 text-xs text-[var(--gm-text-muted)]">
+              {profile.city} · {profile.phone}
             </p>
           </div>
         )}
       </div>
-    </div>
+    </AppShell>
   );
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border-b border-[#F0F0F0] pb-2">
-      <p className="text-xs font-bold text-[#999]">{label}</p>
-      <p className="text-sm text-[#333]">{value}</p>
+    <div className="app-detail-row">
+      <p className="app-detail-label">{label}</p>
+      <p className="app-detail-value">{value}</p>
     </div>
   );
 }
