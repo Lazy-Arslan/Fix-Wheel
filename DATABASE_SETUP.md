@@ -1,11 +1,12 @@
-# FixWheel — Shared cloud database setup
+# FixWheel — Web app & database setup
 
-Web and Android now use **one database**: **Supabase PostgreSQL** (free tier).
+FixWheel is a **Next.js web app** backed by **Supabase PostgreSQL** (free tier).
 
 ```
-Android app  ──HTTP──►  Web API (Next.js)  ──►  Supabase PostgreSQL
-Web browser  ──HTTP──►  Web API (Next.js)  ──►  Supabase PostgreSQL
+Web browser  ──HTTP──►  Next.js API (Vercel)  ──►  Supabase PostgreSQL
 ```
+
+**Live site:** [https://fixwheel-black.vercel.app](https://fixwheel-black.vercel.app)
 
 ---
 
@@ -27,7 +28,7 @@ Web browser  ──HTTP──►  Web API (Next.js)  ──►  Supabase Postgre
 
 ---
 
-## Step 3: Configure the web app
+## Step 3: Configure the web app locally
 
 Create `web/.env.local`:
 
@@ -42,93 +43,25 @@ Then run:
 cd web
 npm install
 npm run db:push
-npm run db:import
 npm run dev
 ```
 
-- `db:push` creates `Customer` and `Mechanic` tables in Supabase.
-- `db:import` (optional) copies existing rows from `web/data/*.csv` into the cloud DB.
+- `db:push` creates `Customer`, `Mechanic`, and `Booking` tables in Supabase.
+- `npm run db:wipe` — delete all customers, mechanics, and bookings (use with care).
 
 ---
 
-## Step 4: Configure the Android app
+## Step 4: Deploy to Vercel
 
-1. Open `APP/FixWheelConfig.java`.
-2. Set `API_BASE_URL` to your web server:
-   - **Emulator + PC running `npm run dev`:** `http://10.0.2.2:3000`
-   - **Physical phone (same Wi‑Fi):** `http://YOUR_PC_LAN_IP:3000` (e.g. `http://192.168.1.5:3000`)
-   - **Deployed web app:** `https://your-app.vercel.app`
-
-3. In **AndroidManifest.xml** (your full Android Studio project), add:
-
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-
-<application
-    android:networkSecurityConfig="@xml/network_security_config"
-    ...>
-```
-
-`APP/res/xml/network_security_config.xml` is included for local HTTP during development.
-
-4. Register activities in **AndroidManifest.xml** (inside `<application>`):
-
-```xml
-<activity android:name=".MechanicHomeActivity" />
-<activity android:name=".MechanicPickLocationActivity" />
-<activity android:name=".MapActivity" />
-<activity android:name=".ServiceSelectionActivity" />
-```
-
-Mechanic login opens **MechanicHomeActivity** (bookings inbox). Customer login opens **MapActivity**.
-
-The Android app uses the same booking APIs as the web app (`/api/bookings`, accept/counter/complete/cancel).
-
----
-
-## Step 5: Verify
-
-1. Register a **customer on web** → log in on **Android** with same name + CNIC → should work.
-2. Register a **mechanic on Android** → appear in web map / nearby search.
+1. Push this repo to GitHub.
+2. In [Vercel](https://vercel.com) → **Add New Project** → import the repo.
+3. Set **Root Directory** to `web`.
+4. Add environment variables: `DATABASE_URL` and `DIRECT_URL` (same values as `.env.local`).
+5. Deploy. Each push to `main` triggers a new production deployment.
 
 ---
 
 ## Free tier notes (Supabase)
 
-- 500 MB database, 50k monthly active users — enough for development and small production.
-- Project pauses after ~1 week of inactivity on free tier; wake it from the Supabase dashboard.
-
----
-
-## Deploy web API (optional, for Android without PC)
-
-Deploy `web/` to [Vercel](https://vercel.com):
-
-1. Push repo to GitHub.
-2. Import project in Vercel, set root to `web`.
-3. Add `DATABASE_URL` and `DIRECT_URL` in Vercel **Environment Variables**.
-4. Set Android `API_BASE_URL` to your Vercel URL (`https://...`).
-
----
-
-## Step 6: Build & distribute Android APK
-
-The `android/` folder is a Gradle project that builds the Java sources in `APP/`.
-
-### Option A — GitHub Actions (recommended)
-
-1. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**
-2. Name: `FIXWHEEL_API_URL`  
-   Value: your Vercel URL, e.g. `https://your-app.vercel.app` (no trailing slash)
-3. **Actions → Build Android APK → Run workflow** (or push a tag `v1.0.0`)
-4. Download **fixwheel-release-apk** from the workflow run, or grab the APK from **Releases** if you used a tag.
-
-### Option B — Android Studio (local)
-
-1. **File → Open** → select the `android/` folder (not `APP/` alone).
-2. Edit `android/gradle.properties` → set `FIXWHEEL_API_URL` to your Vercel URL.
-3. **Build → Build Bundle(s) / APK(s) → Build APK(s)** (release).
-4. APK path: `android/app/build/outputs/apk/release/app-release.apk`
-5. Copy to phone and install (enable **Install unknown apps** if prompted).
-
-Debug builds use `http://10.0.2.2:3000` for emulator + local `npm run dev`.
+- 500 MB database — enough for development and small production.
+- Project may pause after inactivity on free tier; wake it from the Supabase dashboard.

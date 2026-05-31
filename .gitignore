@@ -14,12 +14,10 @@ web/out/
 web/.vercel/
 web/*.tsbuildinfo
 
-# Android / IDE
+# IDE & build artifacts
 *.iml
 .idea/
-.gradle/
-local.properties
 **/build/
-android/.gradle/
-android/app/build/
-android/local.properties
+**/.gradle/
+android/
+APP/
