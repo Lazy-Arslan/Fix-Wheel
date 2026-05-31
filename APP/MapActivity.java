@@ -296,8 +296,13 @@ public class MapActivity extends AppCompatActivity {
                     return;
                 }
                 String[] labels = new String[suggestions.length()];
-                for (int i = 0; i < suggestions.length(); i++) {
-                    labels[i] = suggestions.getJSONObject(i).optString("description", "");
+                try {
+                    for (int i = 0; i < suggestions.length(); i++) {
+                        labels[i] = suggestions.getJSONObject(i).optString("description", "");
+                    }
+                } catch (org.json.JSONException e) {
+                    Toast.makeText(MapActivity.this, "Invalid search results", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 new AlertDialog.Builder(MapActivity.this)
                         .setTitle("Select location")

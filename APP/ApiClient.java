@@ -82,10 +82,10 @@ public final class ApiClient {
                     return;
                 }
                 JSONObject json = new JSONObject(result.body);
-                runOnMain(() -> callback.onSuccess(
-                        json.getString("userType"),
-                        json.getString("username"),
-                        json.getString("usercnic")));
+                final String userType = json.getString("userType");
+                final String username = json.getString("username");
+                final String usercnic = json.getString("usercnic");
+                runOnMain(() -> callback.onSuccess(userType, username, usercnic));
             } catch (Exception e) {
                 runOnMain(() -> callback.onError(networkMessage(e)));
             }

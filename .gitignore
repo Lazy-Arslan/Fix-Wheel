@@ -20,3 +20,6 @@ web/*.tsbuildinfo
 .gradle/
 local.properties
 **/build/
+android/.gradle/
+android/app/build/
+android/local.properties

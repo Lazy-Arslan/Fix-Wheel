@@ -108,3 +108,27 @@ Deploy `web/` to [Vercel](https://vercel.com):
 2. Import project in Vercel, set root to `web`.
 3. Add `DATABASE_URL` and `DIRECT_URL` in Vercel **Environment Variables**.
 4. Set Android `API_BASE_URL` to your Vercel URL (`https://...`).
+
+---
+
+## Step 6: Build & distribute Android APK
+
+The `android/` folder is a Gradle project that builds the Java sources in `APP/`.
+
+### Option A — GitHub Actions (recommended)
+
+1. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**
+2. Name: `FIXWHEEL_API_URL`  
+   Value: your Vercel URL, e.g. `https://your-app.vercel.app` (no trailing slash)
+3. **Actions → Build Android APK → Run workflow** (or push a tag `v1.0.0`)
+4. Download **fixwheel-release-apk** from the workflow run, or grab the APK from **Releases** if you used a tag.
+
+### Option B — Android Studio (local)
+
+1. **File → Open** → select the `android/` folder (not `APP/` alone).
+2. Edit `android/gradle.properties` → set `FIXWHEEL_API_URL` to your Vercel URL.
+3. **Build → Build Bundle(s) / APK(s) → Build APK(s)** (release).
+4. APK path: `android/app/build/outputs/apk/release/app-release.apk`
+5. Copy to phone and install (enable **Install unknown apps** if prompted).
+
+Debug builds use `http://10.0.2.2:3000` for emulator + local `npm run dev`.
