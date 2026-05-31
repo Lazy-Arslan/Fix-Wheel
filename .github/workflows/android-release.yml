@@ -31,7 +31,9 @@ jobs:
         working-directory: android
         env:
           FIXWHEEL_API_URL: ${{ secrets.FIXWHEEL_API_URL }}
-        run: ./gradlew assembleRelease --no-daemon
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
