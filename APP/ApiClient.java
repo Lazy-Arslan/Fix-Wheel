@@ -375,7 +375,8 @@ public final class ApiClient {
     }
 
     private static String networkMessage(Exception e) {
-        return "Cannot reach server. Check FixWheelConfig.API_BASE_URL and npm run dev. "
+        return "Cannot reach server at " + FixWheelConfig.API_BASE_URL
+                + ". Check your internet connection and API URL. "
                 + e.getMessage();
     }
 

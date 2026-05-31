@@ -26,6 +26,16 @@ jobs:
             echo "::error::Add repository secret FIXWHEEL_API_URL (your Vercel URL, e.g. https://fix-wheel.vercel.app)"
             exit 1
           fi
+          URL="${{ secrets.FIXWHEEL_API_URL }}"
+          if echo "$URL" | grep -qi "REPLACE_WITH_YOUR"; then
+            echo "::error::FIXWHEEL_API_URL secret still contains the placeholder text"
+            exit 1
+          fi
+          if ! echo "$URL" | grep -q "^https://"; then
+            echo "::error::FIXWHEEL_API_URL must start with https://"
+            exit 1
+          fi
+          echo "API host: $(echo "$URL" | sed -E 's|https?://([^/]+).*|\1|')"
 
       - name: Build release APK
         working-directory: android
@@ -33,7 +43,7 @@ jobs:
           FIXWHEEL_API_URL: ${{ secrets.FIXWHEEL_API_URL }}
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon -PFIXWHEEL_API_URL="${FIXWHEEL_API_URL}"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4

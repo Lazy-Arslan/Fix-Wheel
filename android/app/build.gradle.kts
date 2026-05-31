@@ -10,8 +10,8 @@ android {
         applicationId = "com.example.fixwheel"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
 
     buildFeatures {
@@ -43,10 +43,24 @@ android {
         }
         release {
             isMinifyEnabled = false
-            val apiUrl = (project.findProperty("FIXWHEEL_API_URL") as String?)
-                ?.trim()
-                ?.removeSuffix("/")
-                ?: "https://REPLACE_WITH_YOUR_VERCEL_URL.vercel.app"
+            val apiUrl = sequenceOf(
+                project.findProperty("FIXWHEEL_API_URL") as String?,
+                System.getenv("FIXWHEEL_API_URL"),
+            )
+                .filterNotNull()
+                .map { it.trim().removeSuffix("/") }
+                .firstOrNull { it.isNotEmpty() }
+                ?: error(
+                    "FIXWHEEL_API_URL is required for release builds " +
+                        "(Gradle -P flag or environment variable)."
+                )
+            if (apiUrl.contains("REPLACE_WITH_YOUR", ignoreCase = true)) {
+                error("FIXWHEEL_API_URL still uses the placeholder — set your real Vercel URL.")
+            }
+            if (!apiUrl.startsWith("https://")) {
+                error("FIXWHEEL_API_URL must start with https:// (got: $apiUrl)")
+            }
+            logger.lifecycle("Release API_BASE_URL = $apiUrl")
             buildConfigField("String", "API_BASE_URL", "\"$apiUrl\"")
             signingConfig = if (project.hasProperty("RELEASE_STORE_FILE")) {
                 signingConfigs.getByName("release")
