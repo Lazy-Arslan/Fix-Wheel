@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <!-- Watermark (covers full screen, semi-transparent) -->
+    <ImageView
+        android:id="@+id/watermark"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:alpha="0.5"
+        android:contentDescription="@string/watermark_desc"
+        android:scaleType="centerCrop"
+        android:src="@drawable/fix_wheel" />
+
+    <!-- Main content LinearLayout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- FixWheel Logo -->
+        <ImageView
+            android:id="@+id/splashLogo"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="20dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/fix_wheel"
+            android:alpha="0.3"
+            android:translationY="300dp"
+            tools:translationY="0dp"
+            tools:alpha="1.0" />
+
+        <!-- App Name -->
+        <TextView
+            android:id="@+id/splashTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#003366"
+            android:alpha="0.0"
+            android:translationX="-500dp"
+            tools:translationX="0dp"
+            tools:alpha="1.0" />
+
+        <!-- Tagline -->
+        <TextView
+            android:id="@+id/splashTagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/splash_tagline"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:alpha="0.0"
+            android:translationX="500dp"
+            tools:translationX="0dp"
+            tools:alpha="1.0" />
+
+    </LinearLayout>
+
+</RelativeLayout>

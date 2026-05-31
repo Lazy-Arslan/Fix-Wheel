@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F7FB">
+
+    <!-- TOP SEARCH BAR -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:elevation="6dp">
+
+        <!-- Title Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/fix_wheel"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/app_name"
+                android:layout_marginEnd="10dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Where do you need service?"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#003366" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Search, tap map, or use GPS"
+                    android:textSize="11sp"
+                    android:textColor="#999999" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/logoutBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Logout"
+                android:textSize="11sp"
+                android:backgroundTint="#003D82"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+
+        <!-- Search Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:background="@drawable/input_background"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔍"
+                android:textSize="16sp"
+                android:layout_marginEnd="6dp" />
+
+            <SearchView
+                android:id="@+id/mapSearchView"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:queryHint="Search area or city..."
+                android:iconifiedByDefault="false" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- MAP -->
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <!-- LEGEND PILL (floats above bottom panel visually via elevation) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@android:color/transparent"
+        android:paddingTop="10dp"
+        android:paddingBottom="4dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <!-- You -->
+        <LinearLayout
+            android:id="@+id/layerYouBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_white_background"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:layout_marginEnd="10dp"
+            android:elevation="4dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/gps_icon"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="6dp"
+                android:contentDescription="You" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="You"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#003366" />
+        </LinearLayout>
+
+        <!-- Mechanics -->
+        <LinearLayout
+            android:id="@+id/layerMechanicsBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_white_background"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:elevation="4dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/mechanic_icon"
+                android:scaleType="fitCenter"
+                android:layout_marginEnd="6dp"
+                android:contentDescription="Mechanic" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mechanics"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#003366" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layerBookedBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_white_background"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:elevation="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Booked"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- BOTTOM PANEL — no active booking -->
+    <LinearLayout
+        android:id="@+id/noBookingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="16dp"
+        android:elevation="10dp">
+
+        <!-- Selected location row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/input_background"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📍"
+                android:textSize="18sp"
+                android:layout_marginEnd="10dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Selected Location"
+                    android:textSize="11sp"
+                    android:textColor="#999999" />
+
+                <TextView
+                    android:id="@+id/locationText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fetching your location..."
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#003D82"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+            </LinearLayout>
+
+            <!-- GPS refresh hint -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔄"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Mechanics count badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🟢"
+                android:textSize="12sp"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/mechanicCountTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Search location to find mechanics"
+                android:textSize="12sp"
+                android:textColor="#2E7D32"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/useGpsBtn"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginBottom="10dp"
+            android:text="Use my GPS location"
+            android:backgroundTint="@android:color/white"
+            android:textColor="#003D82" />
+
+        <Button
+            android:id="@+id/confirmLocationBtn"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="CONFIRM LOCATION"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:letterSpacing="0.08"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#003D82" />
+
+    </LinearLayout>
+
+    <!-- BOTTOM PANEL — active booking -->
+    <ScrollView
+        android:id="@+id/bookingPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:background="@android:color/white"
+        android:elevation="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/bookingTitleTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Active booking"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#003366" />
+
+            <TextView
+                android:id="@+id/bookingDetailTV"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textSize="13sp"
+                android:textColor="#444444" />
+
+            <LinearLayout
+                android:id="@+id/counterOfferPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:background="#FFF8E1">
+
+                <TextView
+                    android:id="@+id/counterOfferTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textColor="#E65100" />
+
+                <Button
+                    android:id="@+id/acceptCounterBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Accept offer"
+                    android:backgroundTint="#2E7D32"
+                    android:textColor="@android:color/white" />
+
+                <Button
+                    android:id="@+id/customerCounterBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Counter price"
+                    android:backgroundTint="#0D47A1"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/customerCompleteBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Issue resolved — confirm completion"
+                android:backgroundTint="#2E7D32"
+                android:textColor="@android:color/white"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/cancelBookingBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Cancel booking"
+                android:backgroundTint="#C62828"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

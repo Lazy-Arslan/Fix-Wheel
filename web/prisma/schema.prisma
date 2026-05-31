@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  cnic      String   @unique
+  email     String
+  phone     String
+  city      String
+  bikeModel String   @default("")
+  carModel  String   @default("")
+  address   String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Mechanic {
+  id             String    @id @default(cuid())
+  name           String
+  cnic           String    @unique
+  email          String
+  phone          String
+  city           String
+  shopName       String
+  license        String
+  specialization String
+  experience     String    @default("")
+  address        String    @default("")
+  lat            Float     @default(0)
+  lng            Float     @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  bookings       Booking[]
+}
+
+model Booking {
+  id              String   @id @default(cuid())
+  customerCnic    String
+  customerName    String
+  mechanicId      String
+  mechanic        Mechanic @relation(fields: [mechanicId], references: [id])
+  vehicle         String
+  issue           String
+  customIssue     String   @default("")
+  customerLat     Float
+  customerLng     Float
+  customerOffer   Int      @default(0)
+  mechanicCounter Int?
+  agreedPrice     Int?
+  etaMinutes          Int?
+  status              String   @default("pending")
+  mechanicCompleted   Boolean  @default(false)
+  customerCompleted   Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([customerCnic])
+  @@index([mechanicId])
+  @@index([status])
+}

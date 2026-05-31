@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.FixWheel" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/primary_dark</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/primary_orange</item>
+        <item name="colorSecondaryVariant">@color/primary_orange</item>
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <!-- Window background -->
+        <item name="android:windowBackground">@color/white</item>
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/dark_gray</item>
+        <item name="android:textColorSecondary">@color/medium_gray</item>
+    </style>
+
+</resources>

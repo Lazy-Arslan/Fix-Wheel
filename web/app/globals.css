@@ -1,0 +1,108 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --primary-blue: #003d82;
+  --dark-blue: #003366;
+  --light-blue: #1565c0;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  color: #333333;
+  background: #ffffff;
+}
+
+@keyframes splash-logo {
+  from {
+    opacity: 0.3;
+    transform: translateY(80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes splash-title {
+  from {
+    opacity: 0;
+    transform: translateX(-120px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes splash-tagline {
+  from {
+    opacity: 0;
+    transform: translateX(120px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes splash-watermark {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.08;
+  }
+}
+
+.splash-logo {
+  animation: splash-logo 0.7s ease-out 0.1s forwards;
+  opacity: 0.3;
+}
+
+.splash-title {
+  animation: splash-title 0.6s ease-out 0.5s forwards;
+  opacity: 0;
+}
+
+.splash-tagline {
+  animation: splash-tagline 0.6s ease-out 0.8s forwards;
+  opacity: 0;
+}
+
+.splash-watermark {
+  animation: splash-watermark 2s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes customer-pin-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 6px rgba(0, 123, 255, 0.35), 0 2px 10px rgba(0, 0, 0, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 14px rgba(0, 123, 255, 0.12), 0 2px 10px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.customer-pin-you {
+  animation: customer-pin-pulse 1.6s ease-in-out infinite;
+}
+
+.leaflet-tooltip.booked-mechanic-tag {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #81c784;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.2);
+  white-space: nowrap;
+}
+
+.leaflet-tooltip.booked-mechanic-tag::before {
+  border-top-color: #81c784;
+}
+

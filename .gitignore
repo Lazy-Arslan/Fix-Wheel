@@ -1,0 +1,22 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets — never commit
+.env
+.env.local
+.env.*.local
+
+# Web (Next.js)
+web/node_modules/
+web/.next/
+web/out/
+web/.vercel/
+web/*.tsbuildinfo
+
+# Android / IDE
+*.iml
+.idea/
+.gradle/
+local.properties
+**/build/
