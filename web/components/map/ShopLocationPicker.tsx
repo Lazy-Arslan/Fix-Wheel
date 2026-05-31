@@ -78,7 +78,7 @@ export function ShopLocationPicker({
   };
 
   return (
-    <div className="mb-4 rounded-xl border-2 border-[#BBDEFB] bg-[#F5F9FF] p-4">
+    <div className="mb-4 overflow-visible rounded-xl border-2 border-[#BBDEFB] bg-[#F5F9FF] p-4">
       <label className="mb-1 block text-sm font-bold text-[#003366]">
         Shop location *
       </label>
@@ -87,16 +87,18 @@ export function ShopLocationPicker({
         shop pin, then confirm.
       </p>
 
-      <LocationSearch
-        placeholder="Search city, area, or landmark in Pakistan…"
-        onPlaceSelect={(lat, lng, address) => setDraft(lat, lng, address)}
-      />
+      <div className="shop-location-search">
+        <LocationSearch
+          placeholder="Search city, area, or landmark in Pakistan…"
+          onPlaceSelect={(lat, lng, address) => setDraft(lat, lng, address)}
+        />
+      </div>
 
       <p className="mt-2 text-[11px] text-[#888]">
         No match? Tap the map below to set your shop exactly.
       </p>
 
-      <div className="mt-3">
+      <div className="shop-location-map mt-3">
         <PickLocationMap
           position={position}
           onPositionChange={(lat, lng) => setDraft(lat, lng)}

@@ -1021,6 +1021,18 @@ body {
 .map-search-wrap {
   position: relative;
   width: 100%;
+  z-index: 1;
+}
+
+.shop-location-search {
+  position: relative;
+  z-index: 1000;
+}
+
+.shop-location-map {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
 }
 
 .map-search-bar {
@@ -1116,6 +1128,7 @@ body {
   border: 1px solid var(--gm-border);
   background: #fff;
   box-shadow: 0 16px 48px rgba(15, 23, 42, 0.14);
+  z-index: 1001;
 }
 
 .map-search-result {

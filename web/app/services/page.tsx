@@ -16,18 +16,14 @@ import {
 } from "@/lib/constants";
 import { AppShell } from "@/components/layout/AppShell";
 import { getSession } from "@/lib/session";
-import { MARKETING, pub } from "@/lib/marketing-images";
+import { MARKETING } from "@/lib/marketing-images";
 
 const VEHICLES = [
   { id: "car", label: "Car", image: MARKETING.vehicles.car },
   { id: "bike", label: "Bike", image: MARKETING.vehicles.bike },
-  { id: "ebike", label: "E-Bike", image: pub("e bike.jfif") },
+  { id: "ebike", label: "E-Bike", image: MARKETING.vehicles.ebike },
   { id: "truck", label: "Truck", image: MARKETING.vehicles.truck },
-  {
-    id: "rickshaw",
-    label: "Rickshaw",
-    image: MARKETING.fallback("rickshaw", 400, 300),
-  },
+  { id: "rickshaw", label: "Rickshaw", image: MARKETING.vehicles.rickshaw },
 ];
 
 const ISSUE_IMAGES: Record<string, string> = {
@@ -38,7 +34,7 @@ const ISSUE_IMAGES: Record<string, string> = {
   "Engine Repair": MARKETING.services.inspect,
   "Brake Service": MARKETING.services.dent,
   Towing: MARKETING.vehicles.truck,
-  [CUSTOM_ISSUE]: MARKETING.services.inspect,
+  [CUSTOM_ISSUE]: MARKETING.services.customIssue,
 };
 
 const STEPS = [
